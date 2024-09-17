@@ -20,8 +20,8 @@ inputs:
     default: "dev"
 outputs:
   environment:
-    description: "Get env"
-    value: ${{ steps.set-env.outputs.environment}}
+    description: "Set env"
+    value: ${{ steps.set-env.outputs.environment }}
 
 runs:
   # using: "composite"가 있어야만 composite action을 사용가능하다.

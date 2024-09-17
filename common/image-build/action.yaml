@@ -1,0 +1,40 @@
+# 이 action의 이름이다
+name: image-build
+
+# 누가 이 action을 만들었는가
+author: seongjun-actions
+
+# 이 action에 대한 설명
+description: "Use image-build job in github action"
+
+# 이 action에 주입할 수 있는 변수값(변수값을 주입받지 못하면 기본값을 사용한다. 다만 required라서 무조건 주입해야할 듯)
+# 사용하는 곳에서 with 키워드를 통해 변수값을 주입한다.
+inputs:
+  REPOSITORY:
+    description: "set aws ecr repository"
+    required: true
+    default: "my-app"
+  REGISTRY:
+    description: "set aws ecr registry"
+    required: true
+    default: ""
+
+  # 이미지로 사용할 docker file의 경로는 대부분 ./Dockerfile이므로 required:false로 주고 default를 활용하는 방식으로 사용
+  DOCKERFILE_PATH:
+    description: "set dockerfile path"
+    required: false
+    default: "Dockerfile"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+      with:
+        mask-password: "true"
+    - name: docker build & push
+      shell: bash
+      run: |
+        docker build -f ${{ inputs.DOCKERFILE_PATH }} --tag ${{ inputs.REGISTRY }}/${{ inputs.REPOSITORY }}:${{ github.sha }} .
+        docker push ${{ inputs.REGISTRY }}/${{ inputs.REPOSITORY }}:${{ github.sha }}
