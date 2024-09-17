@@ -25,7 +25,8 @@ runs:
 
   # 그리고 모듈화된 job에서 실행할 step을 정의한다.
   steps:
-    - uses: actions/setup-node@v3
+    - name: setup-node
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.NODE_VERSION }}
     - name: Cache Node.js modules
