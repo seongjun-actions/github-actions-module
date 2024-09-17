@@ -1,0 +1,49 @@
+# 이 action의 이름이다
+name: set-environment
+
+# 누가 이 action을 만들었는가
+author: seongjun-actions
+
+# 이 action에 대한 설명
+description: "Use set-environment job in github action"
+
+# 이 action에 주입할 수 있는 변수값(변수값을 주입받지 못하면 기본값을 사용한다. 다만 required라서 무조건 주입해야할 듯)
+# 사용하는 곳에서 with 키워드를 통해 변수값을 주입한다.
+inputs:
+  REF_TYPE:
+    description: "branch or tag"
+    required: true
+    default: "branch"
+  BASE_REF:
+    description: "dev or master"
+    required: true
+    default: "dev"
+outputs:
+  environment:
+    description: "Get env"
+    value: ${{ steps.set-env.outputs.environment}}
+
+runs:
+  # using: "composite"가 있어야만 composite action을 사용가능하다.
+  using: "composite"
+
+  # 그리고 모듈화된 job에서 실행할 step을 정의한다.
+  steps:
+    - name: set env
+      id: set-env
+      shell: bash
+      run: |
+        if [[ ${{ inputs.REF_TYPE }} == "tag" ]]; then
+          echo "environment=qa" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
+        if [[ ${{ inputs.REF_TYPE }} == "branch" ]]; then
+          echo "environment=dev" >> $GITHUB_OUTPUT
+          if [[ ${{ inputs.BASE_REF }} == "master" ]]; then
+              echo "environment=staging" >> $GITHUB_OUTPUT
+          fi
+        fi
+    - name: check output
+      shell: bash
+      run: echo ${{ steps.set-env.outputs.environment }}
