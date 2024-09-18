@@ -46,3 +46,7 @@ runs:
       run: |
         cd ${{ inputs.WORKING_DIRECTORY }}
         npm run build
+    - name: version2 test
+      shell: bash
+      run: |
+        echo "version 2"
